@@ -1,14 +1,26 @@
-import { useState, useEffect, ReactNode } from 'react'
+import { useState, ReactNode, ChangeEvent } from 'react'
 import { Grid, Typography, AppBar, Toolbar, IconButton, Dialog, Divider,
-  Autocomplete, TextField, Button, Paper, useTheme, Stack } from '@mui/material'
-import { DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material'
+  Autocomplete, TextField, Button, Paper, useTheme, Stack, FormGroup, FormControlLabel } from '@mui/material'
+import { DialogContent, DialogContentText, DialogTitle, Checkbox } from '@mui/material'
 import { Leaderboard, Settings, Help } from '@mui/icons-material'
-import { DialogProps } from '@mui/material/Dialog'
 import { algorithms, Algorithm } from './algorithms'
 import { red, yellow, green } from '@mui/material/colors'
 
 
 var Latex = require('react-latex')
+
+const reds = {
+  'true': red['A700'],
+  'colorBlind': '#DC3220'
+}
+const greens = {
+  'true': green['A700'],
+  'colorBlind': '#1AFF1A'
+}
+const yellows = {
+  'true': yellow['A700'],
+  'colorBlind': '#FFC20A'
+}
 
 // Min included and max excluded
 function randomNumber(min: number, max: number) : number {
@@ -37,6 +49,8 @@ function App() {
   const [tries, setTries] = useState(0)
   const [helpOpen, setHelpOpen] = useState(false)
   const [scoreOpen, setScoreOpen] = useState(false)
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const [colorBlind, setColorBlind] = useState<'true' | 'colorBlind'>('colorBlind')
 
   const checkGuess = () => {
     if (value === null)
@@ -45,7 +59,7 @@ function App() {
     setGuesses(newGuesses)
     setAnswered(value?.id === answer.id)
     setTries(tries + 1)
-    setValue(algorithms[0])
+    setValue(null)
   }
 
   return (
@@ -74,19 +88,19 @@ function App() {
                 <Typography>The color of each property of the guess shows how close your guess is</Typography>
               </Grid>
               <Grid item xs={4}>
-                <GuessPropertyPaper color={green['A700']}>{ }</GuessPropertyPaper>
+                <GuessPropertyPaper color={greens[colorBlind]}>{ }</GuessPropertyPaper>
               </Grid>
               <Grid item xs={8}>
                 <Typography>Indicates the property is an exact match</Typography>
               </Grid>
               <Grid item xs={4}>
-                <GuessPropertyPaper color={yellow['A700']}>{ }</GuessPropertyPaper>
+                <GuessPropertyPaper color={yellows[colorBlind]}>{ }</GuessPropertyPaper>
               </Grid>
               <Grid item xs={8}>
                 <Typography>Indicates partial match</Typography>
               </Grid>
               <Grid item xs={4}>
-                <GuessPropertyPaper color={red['A700']}>{ }</GuessPropertyPaper>
+                <GuessPropertyPaper color={reds[colorBlind]}>{ }</GuessPropertyPaper>
               </Grid>
               <Grid item xs={8}>
                 <Typography>Indicates no match between the guess and the answer for this property</Typography>
@@ -139,6 +153,25 @@ function App() {
           </DialogContentText>
         </DialogContent>
       </Dialog>
+      <Dialog
+        open={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        scroll={'paper'}
+      >
+        <DialogTitle>Settings</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            <FormGroup>
+              <FormControlLabel control={
+                <Checkbox 
+                  defaultChecked={colorBlind === 'colorBlind'}
+                  onChange={(e) => setColorBlind(e.target.checked ? 'colorBlind' : 'true')}
+                />
+              } label='Color blind mode' />
+            </FormGroup>
+          </DialogContentText>
+        </DialogContent>
+      </Dialog>
       <AppBar position='static' sx={{marginBottom: 3}}>
         <Toolbar>
           <Typography variant="h5" component="div" sx={{ flexGrow: 1}}>
@@ -146,7 +179,7 @@ function App() {
           </Typography>
           <IconButton color='inherit' onClick={() => setHelpOpen(true)}><Help /></IconButton>
           <IconButton color='inherit' onClick={() => setScoreOpen(true)}><Leaderboard /></IconButton>
-          <IconButton color='inherit'><Settings /></IconButton>
+          <IconButton color='inherit' onClick={() => setSettingsOpen(true)}><Settings /></IconButton>
         </Toolbar>
       </AppBar>
       <Grid container alignItems='center' justifyContent='center' spacing={1} direction="column" rowSpacing={3}> 
@@ -193,25 +226,25 @@ function App() {
           </Grid>
         </Grid> }
         { guesses.map((guess, i: number) => {
-          const classColor = answer.class === guess.class ? green['A700'] : red['A700']
-          const worstTimeColor = answer.worstTime === guess.worstTime ? green['A700'] : red['A700']
-          const averageTimeColor = answer.averageTime === guess.averageTime ? green['A700'] : red['A700']
-          const bestTimeColor = answer.bestTime === guess.bestTime ? green['A700'] : red['A700']
-          const spaceColor = answer.space === guess.space ? green['A700'] : red['A700']
+          const classColor = answer.class === guess.class ? greens[colorBlind] : reds[colorBlind]
+          const worstTimeColor = answer.worstTime === guess.worstTime ? greens[colorBlind] : reds[colorBlind]
+          const averageTimeColor = answer.averageTime === guess.averageTime ? greens[colorBlind] : reds[colorBlind]
+          const bestTimeColor = answer.bestTime === guess.bestTime ? greens[colorBlind] : reds[colorBlind]
+          const spaceColor = answer.space === guess.space ? greens[colorBlind] : reds[colorBlind]
           // Check if each element of guess is in the answer
-          let dataStructColor: string = red['A700']
+          let dataStructColor: string = reds[colorBlind]
           let allStructShared = true
           const larger = guess.dataStruct.length > answer.dataStruct.length ? guess.dataStruct : answer.dataStruct
           const smaller = larger === guess.dataStruct ? answer.dataStruct : guess.dataStruct
           for (const struct of larger){
             if (smaller.includes(struct))
-              dataStructColor = yellow['A700']
+              dataStructColor = yellows[colorBlind]
             else
               allStructShared = false
           }
 
           if (allStructShared)
-            dataStructColor = green['A700']
+            dataStructColor = greens[colorBlind]
 
           return (
             <Grid container key={i} item rowSpacing={1} xs={12} alignItems='center' justifyContent='center' spacing={1}>

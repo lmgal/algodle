@@ -34,7 +34,7 @@ export const algorithms = [{
     worstTime: '$O(n^2)$',
     averageTime: '$O(n^2)$',
     bestTime: '$O(n)$',
-    space: '$O(n)$',
+    space: '$O(1)$',
     dataStruct: ['Array']
 }, {
     id: 3,
@@ -43,7 +43,7 @@ export const algorithms = [{
     worstTime: '$O(n^2)$',
     averageTime: '$O(n^2)$',
     bestTime: '$O(n)$',
-    space: '$O(n)$',
+    space: '$O(1)$',
     dataStruct: ['Array']
 }, {
     id: 4,
