@@ -51,6 +51,7 @@ function App() {
   const [scoreOpen, setScoreOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [colorBlind, setColorBlind] = useState<'true' | 'colorBlind'>('colorBlind')
+  const [gameWon, setGameWon] = useState<number>(0)
 
   const checkGuess = () => {
     if (value === null)
@@ -58,6 +59,8 @@ function App() {
     const newGuesses = guesses.concat([value ? value : algorithms[0]])
     setGuesses(newGuesses)
     setAnswered(value?.id === answer.id)
+    if (value?.id === answer.id)
+      setGameWon(gameWon + 1)
     setTries(tries + 1)
     setValue(null)
   }
@@ -115,7 +118,7 @@ function App() {
         onClose={() => setScoreOpen(false)}
         scroll={'paper'}
       >
-        <DialogTitle>Achievement</DialogTitle>
+        <DialogTitle>Scoreboard</DialogTitle>
         <DialogContent dividers={true}>
           <DialogContentText>
             <Grid container spacing={1}>
@@ -132,7 +135,7 @@ function App() {
                 <Typography textAlign='center'>Max Streak</Typography>
               </Grid>
               <Grid item xs={3}>
-                <Typography textAlign='center'>0</Typography>
+                <Typography textAlign='center'>{gameWon}</Typography>
               </Grid>
               <Grid item xs={3}>
                 <Typography textAlign='center'>0</Typography>
@@ -147,7 +150,7 @@ function App() {
                 <Button>Share</Button>
               </Grid>
               <Grid item xs={4}>
-                <Button>Clear Data</Button>
+                <Button onClick={() => setGameWon(0)}>Clear Data</Button>
               </Grid>
             </Grid>
           </DialogContentText>
