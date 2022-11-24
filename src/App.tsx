@@ -1,9 +1,12 @@
 import { useState, useEffect, ReactNode } from 'react'
-import { Grid, Typography, AppBar, Toolbar, IconButton, 
+import { Grid, Typography, AppBar, Toolbar, IconButton, Dialog, Divider,
   Autocomplete, TextField, Button, Paper, useTheme, Stack } from '@mui/material'
+import { DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material'
 import { Leaderboard, Settings, Help } from '@mui/icons-material'
+import { DialogProps } from '@mui/material/Dialog'
 import { algorithms, Algorithm } from './algorithms'
 import { red, yellow, green } from '@mui/material/colors'
+
 
 var Latex = require('react-latex')
 
@@ -32,6 +35,8 @@ function App() {
   const [guesses, setGuesses] = useState<Array<Algorithm>>([])
   const [answered, setAnswered] = useState(false)
   const [tries, setTries] = useState(0)
+  const [helpOpen, setHelpOpen] = useState(false)
+  const [scoreOpen, setScoreOpen] = useState(false)
 
   const checkGuess = () => {
     if (value === null)
@@ -45,13 +50,102 @@ function App() {
 
   return (
     <>
+      <Dialog
+        open={helpOpen}
+        onClose={() => setHelpOpen(false)}
+        scroll={'paper'}
+      >
+        <DialogTitle>Tutorial</DialogTitle>
+        <DialogContent dividers={true}>
+          <DialogContentText>           
+            <Grid container spacing={1} alignItems='center' sx={{paddingBottom: 2}}>
+              <Grid item xs={12}>
+                <Typography variant="h5" textAlign='center'>Algodle</Typography>
+              </Grid>
+              <Grid item>
+                <Typography>You gets 5 tries to guess the algorithm</Typography>
+              </Grid>
+              <Grid item>
+                <Typography>
+                  The game shows you the class, complexities and data structures involved in your guess
+                </Typography>
+              </Grid>
+              <Grid item>
+                <Typography>The color of each property of the guess shows how close your guess is</Typography>
+              </Grid>
+              <Grid item xs={4}>
+                <GuessPropertyPaper color={green['A700']}>{ }</GuessPropertyPaper>
+              </Grid>
+              <Grid item xs={8}>
+                <Typography>Indicates the property is an exact match</Typography>
+              </Grid>
+              <Grid item xs={4}>
+                <GuessPropertyPaper color={yellow['A700']}>{ }</GuessPropertyPaper>
+              </Grid>
+              <Grid item xs={8}>
+                <Typography>Indicates partial match</Typography>
+              </Grid>
+              <Grid item xs={4}>
+                <GuessPropertyPaper color={red['A700']}>{ }</GuessPropertyPaper>
+              </Grid>
+              <Grid item xs={8}>
+                <Typography>Indicates no match between the guess and the answer for this property</Typography>
+              </Grid>
+            </Grid>
+            <Divider sx={{marginBottom: 2}}/>
+          </DialogContentText>
+        </DialogContent>  
+      </Dialog>
+      <Dialog
+        open={scoreOpen}
+        onClose={() => setScoreOpen(false)}
+        scroll={'paper'}
+      >
+        <DialogTitle>Achievement</DialogTitle>
+        <DialogContent dividers={true}>
+          <DialogContentText>
+            <Grid container spacing={1}>
+              <Grid item xs={3}>
+                <Typography textAlign='center'>Games Won</Typography>
+              </Grid>
+              <Grid item xs={3}>
+                <Typography textAlign='center'>Average Guesses</Typography>
+              </Grid>
+              <Grid item xs={3}>
+                <Typography textAlign='center'>Current Streak</Typography>
+              </Grid>
+              <Grid item xs={3}>
+                <Typography textAlign='center'>Max Streak</Typography>
+              </Grid>
+              <Grid item xs={3}>
+                <Typography textAlign='center'>0</Typography>
+              </Grid>
+              <Grid item xs={3}>
+                <Typography textAlign='center'>0</Typography>
+              </Grid>
+              <Grid item xs={3}>
+                <Typography textAlign='center'>0</Typography>
+              </Grid>
+              <Grid item xs={3}>
+                <Typography textAlign='center'>0</Typography>
+              </Grid>
+              <Grid item xs={2}>
+                <Button>Share</Button>
+              </Grid>
+              <Grid item xs={4}>
+                <Button>Clear Data</Button>
+              </Grid>
+            </Grid>
+          </DialogContentText>
+        </DialogContent>
+      </Dialog>
       <AppBar position='static' sx={{marginBottom: 3}}>
         <Toolbar>
           <Typography variant="h5" component="div" sx={{ flexGrow: 1}}>
             ALGODLE
           </Typography>
-          <IconButton color='inherit'><Help /></IconButton>
-          <IconButton color='inherit'><Leaderboard /></IconButton>
+          <IconButton color='inherit' onClick={() => setHelpOpen(true)}><Help /></IconButton>
+          <IconButton color='inherit' onClick={() => setScoreOpen(true)}><Leaderboard /></IconButton>
           <IconButton color='inherit'><Settings /></IconButton>
         </Toolbar>
       </AppBar>
