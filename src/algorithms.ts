@@ -3,41 +3,41 @@ export type Algorithm = {
     name: string,
     class: string,
     worstTime: string,
+    worstTimeTip?: string,
     averageTime: string,
+    averageTimeTip?: string,
     bestTime: string,
+    bestTimeTip?: string,
     space: string,
+    spaceTip?: string,
     dataStruct: Array<string>
 }
 
-export const algorithms = [{
-    id: 0,
+export const algorithms : Array<Algorithm> = [{
     name: 'Binary Search',
     class: 'Search',
-    worstTime: '$O(log $ $n)$',
-    averageTime: '$O(log $ $n)$',
+    worstTime: '$O(\\log{n})$',
+    averageTime: '$O(\\log{n})$',
     bestTime: '$O(1)$',
     space: '$O(1)$',
     dataStruct: ['Array']
 }, {
-    id: 1,
     name: 'Linear Search',
     class: 'Search',
     worstTime: '$O(n)$',
-    averageTime: '$O(n/2)$',
+    averageTime: '$O(\\frac{n}{2})$',
     bestTime: '$O(1)$',
     space: '$O(1)$',
     dataStruct: ['Array', 'List']
 }, {
-    id: 2,
     name: 'Bubble Sort',
     class: 'Sorting',
     worstTime: '$O(n^2)$',
     averageTime: '$O(n^2)$',
-    bestTime: '$O(n)$',
+    bestTime: '$O(n^2)$',
     space: '$O(1)$',
     dataStruct: ['Array']
 }, {
-    id: 3,
     name: 'Selection Sort',
     class: 'Sorting',
     worstTime: '$O(n^2)$',
@@ -46,34 +46,70 @@ export const algorithms = [{
     space: '$O(1)$',
     dataStruct: ['Array']
 }, {
-    id: 4,
     name: 'Heap Sort',
     class: 'Sorting',
-    worstTime: '$O(nlog$ $n)$',
-    averageTime: '$O(nlog$ $n)$',
+    worstTime: '$O(n\\log{n})$',
+    averageTime: '$O(n\\log{n})$',
     bestTime: '$O(n)$',
-    space: '$O(n)',
+    space: '$O(n)$',
     dataStruct: ['Heap', 'Array']
 }, {
-    id: 5,
     name: 'Merge Sort',
     class: 'Sorting',
-    worstTime: '$O(nlog$ $n)$',
-    averageTime: '$O(nlog$ $n)$',
-    bestTime: '$O(nlog$ $n)$',
+    worstTime: '$O(n\\log{n})$',
+    averageTime: '$O(n\\log{n})$',
+    bestTime: '$O(n\\log{n})$',
     space: '$O(n)$',
     dataStruct: ['Array']
 }, {
-    id: 6,
     name: 'Quick Sort',
     class: 'Sorting',
     worstTime: '$O(n^2)$',
-    averageTime: '$O(nlog$ $n)$',
-    bestTime: '$O(nlog$ $n)$',
-    space: '$O(log$ $n)$',
+    averageTime: '$O(n\\log{n})$',
+    bestTime: '$O(n\\log{n})$',
+    space: '$O(\\log{n})$',
     dataStruct: ['Array']
 }, {
-    id: 7,
+    name: 'Counting Sort',
+    class: 'Sorting',
+    worstTime: '$O(n+k)$',
+    averageTime: '$O(n+k)$',
+    bestTime: '$O(n+k)$',
+    space: '$O(n+k)$',
+    dataStruct: ['Array']
+}, {
+    name: 'Radix Sort',
+    class: 'Sorting',
+    worstTime: '$O(d(n+k))$',
+    averageTime: '$O(d(n+k))$',
+    bestTime: '$O(d(n+k))$',
+    space: '$O(n+b)$',
+    dataStruct: ['Array']
+}, {
+    name: 'Bucket Sort',
+    class: 'Sorting',
+    worstTime: '$O(n^2)$',
+    averageTime: '$O(n)$',
+    bestTime: '$O(n+k)$',
+    space: '$O(n+k)$',
+    dataStruct: ['Array']
+}, {
+    name: 'Shell Sort',
+    class: 'Sorting',
+    worstTime: '$O(n^2)$',
+    averageTime: '$O(n\\log{n})$',
+    bestTime: '$O(n\\log{n})$',
+    space: '$O(1)$',
+    dataStruct: ['Array']
+}, {
+    name: 'Comb Sort',
+    class: 'Sorting',
+    worstTime: '$O(n^2)$',
+    averageTime: '$O(\\frac{n^2}{2^p})$',
+    bestTime: '$O(n\\log{n})$',
+    space: '$O(1)$',
+    dataStruct: ['Array']
+},{
     name: 'Breadth-first Search',
     class: 'Graph Search',
     worstTime: '$O(b^d)$',
@@ -82,7 +118,6 @@ export const algorithms = [{
     space: '$O(b^d)$',
     dataStruct: ['Graph']
 }, {
-    id: 8,
     name: 'Depth-first Search',
     class: 'Graph Search',
     worstTime: '$O(b^d)$',
@@ -91,7 +126,6 @@ export const algorithms = [{
     space: '$O(bd)$',
     dataStruct: ['Graph']
 }, {
-    id: 9,
     name: 'Bellman-Ford Algorithm',
     class: 'Shortest Path',
     worstTime: '$O(VE)$',
@@ -100,7 +134,6 @@ export const algorithms = [{
     space: '$O(V)$',
     dataStruct: ['Directed Graph', 'Weighted Graph']
 }, {
-    id: 10,
     name: "Djkstra's Algorithm (Naive)",
     class: 'Shortest Path',
     worstTime: '$O(V^2)$',
@@ -109,16 +142,14 @@ export const algorithms = [{
     space: '$O(V)$',
     dataStruct: ['Graph', 'Weighted Graph', 'List']
 }, {
-    id: 11,
     name: "Djkstra's Algorithm (Priority Queue/Heap)",
     class: 'Shortest Path',
-    worstTime: '$O(E+Vlog$ $V)$',
-    averageTime: '$O(E+Vlog$ $V)$',
-    bestTime: '$O(E+Vlog$ $V)$',
+    worstTime: '$O(E+V\\log{V})$',
+    averageTime: '$O(E+V\\log{V})$',
+    bestTime: '$O(E+V\\log{V})$',
     space: '$O(V)$',
     dataStruct: ['Graph', 'Weighted Graph', 'Heap']
 }, {
-    id: 12,
     name: 'Floyd-Warshall Algorithm',
     class: 'Shortest Path',
     worstTime: '$O(V^3)$',
@@ -126,4 +157,20 @@ export const algorithms = [{
     bestTime: '$O(V^3)$',
     space: '$O(V^2)$',
     dataStruct: ['Directed Graph', 'Weighted Graph']
-}]
+}, {
+    name: "Kruskal's Algorithm",
+    class: 'Minimum Spanning Tree',
+    worstTime: '$O(E\\log{E)$',
+    averageTime: '$O(E\\log{E)$',
+    bestTime: '$O(E\\log{E)$',
+    space: '$O(E+V)$',
+    dataStruct: ['Weighted Graph']
+}, {
+    name: "Prim's Algorithm",
+    class: 'Minimum Spanning Tree',
+    worstTime: '$O(E\\log{V})$',
+    averageTime: '$O(E\\log{V})$',
+    bestTime: '$O(E\\log{V})$',
+    space: '$O(E+V)$',
+    dataStruct: ['Weighted Graph', 'Heap']
+}].map((algorithm, i) => ({...algorithm, id: i})) // Add id via iterator

@@ -1,13 +1,13 @@
-import { useState, ReactNode, ChangeEvent } from 'react'
-import { Grid, Typography, AppBar, Toolbar, IconButton, Dialog, Divider,
-  Autocomplete, TextField, Button, Paper, useTheme, Stack, FormGroup, FormControlLabel } from '@mui/material'
+import { useState } from 'react'
+import { Grid, Typography, AppBar, Toolbar, IconButton, Dialog,
+  Autocomplete, TextField, Button, useTheme, FormGroup, FormControlLabel } from '@mui/material'
 import { DialogContent, DialogContentText, DialogTitle, Checkbox } from '@mui/material'
 import { Leaderboard, Settings, Help } from '@mui/icons-material'
 import { algorithms, Algorithm } from './algorithms'
 import { red, yellow, green } from '@mui/material/colors'
-
-
-var Latex = require('react-latex')
+import { Guess } from './components/Guess'
+import HelpDialog from './components/HelpDialog'
+import ScoreDialog from './components/ScoreDialog'
 
 const reds = {
   'true': red['A700'],
@@ -27,135 +27,77 @@ function randomNumber(min: number, max: number) : number {
   return Math.floor(Math.random() * (max - min)) + min
 }
 
-const GuessPropertyPaper = (props : {color: string, children: ReactNode}) => {
-  const { color, children } = props
-  return <Paper component={Stack} elevation={6} sx={{
-      minHeight: 60,
-      backgroundColor: color,
-      textAlign: 'center',
-      justifyContent: 'center'
-    }}>
-    {children}
-  </Paper>
-}
-
-const answer = algorithms[randomNumber(0, algorithms.length)]
-
 function App() {
   const theme = useTheme()
   const [value, setValue] = useState<Algorithm | null>(null)
+  const [answer, setAnswer] = useState<Algorithm>(algorithms[randomNumber(0, algorithms.length)])
   const [guesses, setGuesses] = useState<Array<Algorithm>>([])
   const [answered, setAnswered] = useState(false)
   const [tries, setTries] = useState(0)
   const [helpOpen, setHelpOpen] = useState(false)
   const [scoreOpen, setScoreOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
-  const [colorBlind, setColorBlind] = useState<'true' | 'colorBlind'>('colorBlind')
+  const [colorBlind, setColorBlind] = useState<'true' | 'colorBlind'>('true')
   const [gameWon, setGameWon] = useState<number>(0)
+  const [winStreak, setWinStreak] = useState<number>(0)
+  const [maxStreak, setMaxStreak] = useState<number>(0)
+  const [gamesPlayed, setGamesPlayed] = useState<number>(0)
+  const [triesPlayed, setTriesPlayed] = useState<number>(0)
+
+  // Just to count how many algorithms are implemented
+  console.log(algorithms.length)
 
   const checkGuess = () => {
     if (value === null)
       return
     const newGuesses = guesses.concat([value ? value : algorithms[0]])
+    const newAnswered = value?.id === answer.id
+    const newTries = tries + 1
+
     setGuesses(newGuesses)
-    setAnswered(value?.id === answer.id)
-    if (value?.id === answer.id)
+    setAnswered(newAnswered)
+    if (newAnswered){
       setGameWon(gameWon + 1)
-    setTries(tries + 1)
+
+      const newWinStreak = winStreak + 1
+      setWinStreak(newWinStreak)
+      if (newWinStreak > maxStreak) setMaxStreak(newWinStreak)
+    }
+
+    setTries(newTries)
     setValue(null)
+    if (newTries >= 5 && !newAnswered)
+      setWinStreak(0)
   }
+
+  const newGame = () => {
+    setTriesPlayed(triesPlayed + tries)
+    setTries(0)
+    setValue(null)
+    setGuesses([])
+    setAnswer(algorithms[randomNumber(0, algorithms.length)])
+    setAnswered(false)
+    setGamesPlayed(gamesPlayed + 1)
+  }
+
+  const clearData = () => {
+    setGameWon(0)
+    setWinStreak(0)
+    setMaxStreak(0)
+    setTriesPlayed(0)
+    setGamesPlayed(0)
+  }
+
+  // If no games played yet, output 0. Round off to two decimal places. 
+  const averageGuesses = () => gamesPlayed > 0 ? 
+    Math.round(((triesPlayed / gamesPlayed ) + Number.EPSILON) * 100) / 100 : 0
 
   return (
     <>
-      <Dialog
-        open={helpOpen}
-        onClose={() => setHelpOpen(false)}
-        scroll={'paper'}
-      >
-        <DialogTitle>Tutorial</DialogTitle>
-        <DialogContent dividers={true}>
-          <DialogContentText>           
-            <Grid container spacing={1} alignItems='center' sx={{paddingBottom: 2}}>
-              <Grid item xs={12}>
-                <Typography variant="h5" textAlign='center'>Algodle</Typography>
-              </Grid>
-              <Grid item>
-                <Typography>You gets 5 tries to guess the algorithm</Typography>
-              </Grid>
-              <Grid item>
-                <Typography>
-                  The game shows you the class, complexities and data structures involved in your guess
-                </Typography>
-              </Grid>
-              <Grid item>
-                <Typography>The color of each property of the guess shows how close your guess is</Typography>
-              </Grid>
-              <Grid item xs={4}>
-                <GuessPropertyPaper color={greens[colorBlind]}>{ }</GuessPropertyPaper>
-              </Grid>
-              <Grid item xs={8}>
-                <Typography>Indicates the property is an exact match</Typography>
-              </Grid>
-              <Grid item xs={4}>
-                <GuessPropertyPaper color={yellows[colorBlind]}>{ }</GuessPropertyPaper>
-              </Grid>
-              <Grid item xs={8}>
-                <Typography>Indicates partial match</Typography>
-              </Grid>
-              <Grid item xs={4}>
-                <GuessPropertyPaper color={reds[colorBlind]}>{ }</GuessPropertyPaper>
-              </Grid>
-              <Grid item xs={8}>
-                <Typography>Indicates no match between the guess and the answer for this property</Typography>
-              </Grid>
-            </Grid>
-            <Divider sx={{marginBottom: 2}}/>
-          </DialogContentText>
-        </DialogContent>  
-      </Dialog>
-      <Dialog
-        open={scoreOpen}
-        onClose={() => setScoreOpen(false)}
-        scroll={'paper'}
-      >
-        <DialogTitle>Scoreboard</DialogTitle>
-        <DialogContent dividers={true}>
-          <DialogContentText>
-            <Grid container spacing={1}>
-              <Grid item xs={3}>
-                <Typography textAlign='center'>Games Won</Typography>
-              </Grid>
-              <Grid item xs={3}>
-                <Typography textAlign='center'>Average Guesses</Typography>
-              </Grid>
-              <Grid item xs={3}>
-                <Typography textAlign='center'>Current Streak</Typography>
-              </Grid>
-              <Grid item xs={3}>
-                <Typography textAlign='center'>Max Streak</Typography>
-              </Grid>
-              <Grid item xs={3}>
-                <Typography textAlign='center'>{gameWon}</Typography>
-              </Grid>
-              <Grid item xs={3}>
-                <Typography textAlign='center'>0</Typography>
-              </Grid>
-              <Grid item xs={3}>
-                <Typography textAlign='center'>0</Typography>
-              </Grid>
-              <Grid item xs={3}>
-                <Typography textAlign='center'>0</Typography>
-              </Grid>
-              <Grid item xs={2}>
-                <Button>Share</Button>
-              </Grid>
-              <Grid item xs={4}>
-                <Button onClick={() => setGameWon(0)}>Clear Data</Button>
-              </Grid>
-            </Grid>
-          </DialogContentText>
-        </DialogContent>
-      </Dialog>
+      <HelpDialog helpOpen={helpOpen} setHelpOpen={setHelpOpen} 
+        red={reds[colorBlind]} green={greens[colorBlind]} yellow={yellows[colorBlind]} />
+      <ScoreDialog scoreOpen={scoreOpen} setScoreOpen={setScoreOpen} clearData={clearData}
+        gameWon={gameWon} averageGuesses={averageGuesses()} winStreak={winStreak} maxStreak={maxStreak} />
       <Dialog
         open={settingsOpen}
         onClose={() => setSettingsOpen(false)}
@@ -249,49 +191,18 @@ function App() {
           if (allStructShared)
             dataStructColor = greens[colorBlind]
 
-          return (
-            <Grid container key={i} item rowSpacing={1} xs={12} alignItems='center' justifyContent='center' spacing={1}>
-              <Grid item xs={1.5}>
-                <GuessPropertyPaper color={theme.palette.background.paper}>
-                  {guess.name}
-                </GuessPropertyPaper>
-              </Grid>
-              <Grid item xs={1.5}>
-                <GuessPropertyPaper color={classColor}>
-                  {guess.class}
-                </GuessPropertyPaper>
-              </Grid>
-              <Grid item xs={1.5}>
-                <GuessPropertyPaper color={worstTimeColor}>
-                  <Latex>{guess.worstTime}</Latex>
-                </GuessPropertyPaper>
-              </Grid>
-              <Grid item xs={1.5}>
-                <GuessPropertyPaper color={averageTimeColor}>
-                  <Latex>{guess.averageTime}</Latex>
-                </GuessPropertyPaper>
-              </Grid>
-              <Grid item xs={1.5}>
-                <GuessPropertyPaper color={bestTimeColor}>
-                  <Latex>{guess.bestTime}</Latex>
-                </GuessPropertyPaper>
-              </Grid>
-              <Grid item xs={1.5}>
-                <GuessPropertyPaper color={spaceColor}>
-                  <Latex>{guess.space}</Latex>
-                </GuessPropertyPaper>
-              </Grid>
-              <Grid item xs={1.5}>
-                <GuessPropertyPaper color={dataStructColor}>
-                  {guess.dataStruct.join(', ') }
-                </GuessPropertyPaper>
-              </Grid>
-            </Grid>
-          )
+          return <Guess guess={guess} theme={theme} classColor={classColor} worstTimeColor={worstTimeColor}
+            averageTimeColor={averageTimeColor} bestTimeColor={bestTimeColor} spaceColor={spaceColor}
+            dataStructColor={dataStructColor} key={i} myKey={i}/>
         }) }
         { (answered || tries >= 5) && 
-          <Grid item>
-            <Typography>The answer is {answer.name}</Typography>
+          <Grid container item direction="row" alignItems="center" justifyContent="center" spacing={2}>
+            <Grid item>
+              <Typography>The answer is {answer.name}</Typography>
+            </Grid>
+            <Grid item>
+              <Button variant="contained" onClick={newGame}>{answered ? 'Continue' : 'New Game'}</Button>
+            </Grid>
           </Grid>
         }
       </Grid>
@@ -299,4 +210,4 @@ function App() {
   );
 }
 
-export default App;
+export default App
