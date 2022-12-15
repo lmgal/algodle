@@ -15,7 +15,7 @@ export default function TutorialDialog(props: {
         >
         <DialogTitle>Tutorial</DialogTitle>
         <DialogContent dividers={true}>
-            <DialogContentText>           
+            <DialogContentText component={'div'}>           
                 <Grid container spacing={1} alignItems='center' sx={{paddingBottom: 2}}>
                 <Grid item xs={12}>
                     <Typography variant="h5" textAlign='center'>Algodle</Typography>

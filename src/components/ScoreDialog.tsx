@@ -14,7 +14,7 @@ export default function ScoreDialog(props: {
         >
             <DialogTitle>Scoreboard</DialogTitle>
             <DialogContent dividers={true}>
-            <DialogContentText>
+            <DialogContentText component={'div'}>
                 <Grid container spacing={1}>
                 <Grid item xs={3}>
                     <Typography textAlign='center'>Games Won</Typography>

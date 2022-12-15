@@ -1,13 +1,13 @@
 import { useState } from 'react'
-import { Grid, Typography, AppBar, Toolbar, IconButton, Dialog,
-  Autocomplete, TextField, Button, useTheme, FormGroup, FormControlLabel } from '@mui/material'
-import { DialogContent, DialogContentText, DialogTitle, Checkbox } from '@mui/material'
+import { Grid, Typography, AppBar, Toolbar, IconButton,
+  Autocomplete, TextField, Button, useTheme } from '@mui/material'
 import { Leaderboard, Settings, Help } from '@mui/icons-material'
 import { algorithms, Algorithm } from './algorithms'
 import { red, yellow, green } from '@mui/material/colors'
 import { Guess } from './components/Guess'
 import HelpDialog from './components/HelpDialog'
 import ScoreDialog from './components/ScoreDialog'
+import SettingsDialog from './components/SettingsDialog'
 
 const reds = {
   'true': red['A700'],
@@ -27,22 +27,29 @@ function randomNumber(min: number, max: number) : number {
   return Math.floor(Math.random() * (max - min)) + min
 }
 
+
 function App() {
   const theme = useTheme()
+  // Game
   const [value, setValue] = useState<Algorithm | null>(null)
   const [answer, setAnswer] = useState<Algorithm>(algorithms[randomNumber(0, algorithms.length)])
   const [guesses, setGuesses] = useState<Array<Algorithm>>([])
   const [answered, setAnswered] = useState(false)
   const [tries, setTries] = useState(0)
+  // Help
   const [helpOpen, setHelpOpen] = useState(false)
+  // Scoreboard
   const [scoreOpen, setScoreOpen] = useState(false)
-  const [settingsOpen, setSettingsOpen] = useState(false)
-  const [colorBlind, setColorBlind] = useState<'true' | 'colorBlind'>('true')
   const [gameWon, setGameWon] = useState<number>(0)
   const [winStreak, setWinStreak] = useState<number>(0)
   const [maxStreak, setMaxStreak] = useState<number>(0)
   const [gamesPlayed, setGamesPlayed] = useState<number>(0)
   const [triesPlayed, setTriesPlayed] = useState<number>(0)
+  // Settings
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  // Thinking of changing this to color mode (> 2). If not, should be refactored to boolean
+  const [colorBlind, setColorBlind] = useState<'true' | 'colorBlind'>('true') 
+  const [maxTries, setMaxTries] = useState<number>(5)
 
   // Just to count how many algorithms are implemented
   console.log(algorithms.length)
@@ -50,7 +57,7 @@ function App() {
   const checkGuess = () => {
     if (value === null)
       return
-    const newGuesses = guesses.concat([value ? value : algorithms[0]])
+    const newGuesses = guesses.concat([value as Algorithm])
     const newAnswered = value?.id === answer.id
     const newTries = tries + 1
 
@@ -66,7 +73,7 @@ function App() {
 
     setTries(newTries)
     setValue(null)
-    if (newTries >= 5 && !newAnswered)
+    if (newTries >= maxTries && !newAnswered)
       setWinStreak(0)
   }
 
@@ -88,6 +95,16 @@ function App() {
     setGamesPlayed(0)
   }
 
+  const saveSettings = (
+    newColorBlind: typeof colorBlind, 
+    newMaxTries: number) => {
+      setColorBlind(newColorBlind)
+      if (newMaxTries !== maxTries){
+        newGame()
+      }
+      setMaxTries(newMaxTries)
+  }
+
   // If no games played yet, output 0. Round off to two decimal places. 
   const averageGuesses = () => gamesPlayed > 0 ? 
     Math.round(((triesPlayed / gamesPlayed ) + Number.EPSILON) * 100) / 100 : 0
@@ -98,25 +115,8 @@ function App() {
         red={reds[colorBlind]} green={greens[colorBlind]} yellow={yellows[colorBlind]} />
       <ScoreDialog scoreOpen={scoreOpen} setScoreOpen={setScoreOpen} clearData={clearData}
         gameWon={gameWon} averageGuesses={averageGuesses()} winStreak={winStreak} maxStreak={maxStreak} />
-      <Dialog
-        open={settingsOpen}
-        onClose={() => setSettingsOpen(false)}
-        scroll={'paper'}
-      >
-        <DialogTitle>Settings</DialogTitle>
-        <DialogContent>
-          <DialogContentText>
-            <FormGroup>
-              <FormControlLabel control={
-                <Checkbox 
-                  defaultChecked={colorBlind === 'colorBlind'}
-                  onChange={(e) => setColorBlind(e.target.checked ? 'colorBlind' : 'true')}
-                />
-              } label='Color blind mode' />
-            </FormGroup>
-          </DialogContentText>
-        </DialogContent>
-      </Dialog>
+      <SettingsDialog settingsOpen={settingsOpen} setSettingsOpen={setSettingsOpen} colorBlind={colorBlind}
+        maxTries={maxTries} saveSettings={saveSettings} />
       <AppBar position='static' sx={{marginBottom: 3}}>
         <Toolbar>
           <Typography variant="h5" component="div" sx={{ flexGrow: 1}}>
@@ -143,7 +143,7 @@ function App() {
             />
           </Grid>
           <Grid item>
-            { (!answered && tries < 5) &&
+            { (!answered && tries < maxTries) &&
               <Button variant='contained' onClick={checkGuess}>Submit</Button>}
           </Grid>
         </Grid>
@@ -195,7 +195,7 @@ function App() {
             averageTimeColor={averageTimeColor} bestTimeColor={bestTimeColor} spaceColor={spaceColor}
             dataStructColor={dataStructColor} key={i} myKey={i}/>
         }) }
-        { (answered || tries >= 5) && 
+        { (answered || tries >= maxTries) && 
           <Grid container item direction="row" alignItems="center" justifyContent="center" spacing={2}>
             <Grid item>
               <Typography>The answer is {answer.name}</Typography>

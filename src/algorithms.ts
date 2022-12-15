@@ -109,6 +109,22 @@ export const algorithms : Array<Algorithm> = [{
     bestTime: '$O(n\\log{n})$',
     space: '$O(1)$',
     dataStruct: ['Array']
+}, {
+    name: 'Pigeonhole Sort',
+    class: 'Sorting',
+    worstTime: '$O(n+N)$',
+    averageTime: '$O(n+N)$',
+    bestTime: '$O(n+N)$',
+    space: '$O(n+N)$',
+    dataStruct: ['Array']
+}, {
+    name: 'Cycle Sort',
+    class: 'Sorting',
+    worstTime: '$O(n^2)$',
+    averageTime: '$O(n^2)$',
+    bestTime: '$O(n^2)$',
+    space: '$O(n)$',
+    dataStruct: ['Array']
 },{
     name: 'Breadth-first Search',
     class: 'Graph Search',
@@ -171,6 +187,22 @@ export const algorithms : Array<Algorithm> = [{
     worstTime: '$O(E\\log{V})$',
     averageTime: '$O(E\\log{V})$',
     bestTime: '$O(E\\log{V})$',
-    space: '$O(E+V)$',
+    space: '$O(V+E)$',
     dataStruct: ['Weighted Graph', 'Heap']
+}, {
+    name: "Kosaraju's Algorithm",
+    class: 'Strongly connected components',
+    worstTime: '$O(V+E)$',
+    averageTime: '$O(V+E)$',
+    bestTime: '$O(V+E)$',
+    space: '$O(V)$',
+    dataStruct: ['Directed Graph']
+}, {
+    name: "Tarjan's Algorithm",
+    class: 'Strongly connected components',
+    worstTime: '$O(V+E)$',
+    averageTime: '$O(V+E)$',
+    bestTime: '$O(V+E)$',
+    space: '$O(V)$',
+    dataStruct: ['Directed Graph']
 }].map((algorithm, i) => ({...algorithm, id: i})) // Add id via iterator
